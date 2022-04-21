@@ -1,0 +1,77 @@
+import wixData from 'wix-data';
+
+export function searchForDuplicates(value, info) {
+ // info contains the hook context
+ // use the collectionName property to use function for multiple collections
+ return wixData.query("Company")
+        .eq("companyName", value.companyName)
+        .find()
+        .then((results) => {
+ return results.items.length;
+        })
+        .catch((err) => {
+ let errorMsg = err;
+        })
+}
+
+
+export function searchForDuplicates2 (value, info) {
+ // info contains the hook context
+ // use the collectionName property to use function for multiple collections
+ return wixData.query("TravelJobs")
+        .eq("jobName", value.jobName)
+        .find()
+        .then((results) => {
+ return results.items.length;
+        })
+        .catch((err) => {
+ let errorMsg = err;
+        })
+}
+
+export function Company_beforeUpdate (item, context) {
+ // Calls routine to check if value already exists in the collection.
+ // If value not found, then save record.
+ // Else, if value is found, then reject this insert to prevent duplicate values.
+ // Note: concurrent inserts may result in duplicates.
+ // Pass context to searchForDuplicates to use for multiple collections. 
+ return searchForDuplicates(item, context).then((res) => {
+ if(res > 0) {
+ 
+ return Promise.reject('This item already exists');
+        }
+ return item;
+    });
+}
+
+export function Jobs_beforeInsert (item, context) {
+ // Calls routine to check if value already exists in the collection.
+ // If value not found, then save record.
+ // Else, if value is found, then reject this insert to prevent duplicate values.
+ // Note: concurrent inserts may result in duplicates.
+ // Pass context to searchForDuplicates to use for multiple collections. 
+ return searchForDuplicates2 (item, context).then((res) => {
+ if(res > 0) {
+ 
+ return Promise.reject('This item already exists');
+        }
+ return item;
+    });
+}
+
+
+export function Jobs_beforeUpdate (item, context) {
+ // Calls routine to check if value already exists in the collection.
+ // If value not found, then save record.
+ // Else, if value is found, then reject this insert to prevent duplicate values.
+ // Note: concurrent inserts may result in duplicates.
+ // Pass context to searchForDuplicates to use for multiple collections. 
+ return searchForDuplicates2 (item, context).then((res) => {
+ if(res > 0) {
+ 
+ return Promise.reject('This item already exists');
+        }
+ return item;
+    });
+}
+
